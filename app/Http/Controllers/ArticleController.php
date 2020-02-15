@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\Article as ArticleResource;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\Article;
 
@@ -16,7 +17,7 @@ class ArticleController extends Controller{
    public function index(){
 
       // Get all articles.
-      $articles = Article::paginate(10);
+      $articles = Article::orderBy("created_at", "desc")->paginate(10);
 
       // Return all this articles as a collection.
       return ArticleResource::collection($articles);
