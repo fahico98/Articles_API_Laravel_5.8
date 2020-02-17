@@ -1,17 +1,50 @@
 
 <template>
-   <div class="my-5">
-      <h2 class="mb-4">Articles</h2>
-      <form action="#" v-on:submit.prevent="saveArticle()">
-         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Article title" v-model="article.title">
+   <div class="my-4">
+      <h2 class="mb-3">Articles</h2>
+
+      <!-- Button trigger modal -->
+      <button type="button" v-on:click="clearModalForm" class="btn btn-outline-primary" data-toggle="modal"
+         data-target="#articleModalForm">
+         Add article
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="articleModalForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">{{ modalTitle }}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <form action="#" v-on:submit.prevent="saveArticle()">
+                  <div class="modal-body">
+                     <div class="form-group">
+                        <label for="articleTitleInput">Article title</label>
+                        <input type="text" class="form-control" id="articleTitleInput" placeholder="title"
+                           v-model="article.title">
+                     </div>
+                     <div class="form-group">
+                        <label for="articleBodyInput">Article body</label>
+                        <textarea class="form-control" id="articleBodyInput" placeholder="Article body" rows="4"
+                           style="resize: none;" v-model="article.body"></textarea>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal" ref="cancelButton">
+                        Cancel
+                     </button>
+                     <button type="submit" class="btn btn-primary">{{ saveButtonText }}</button>
+                  </div>
+               </form>
+            </div>
          </div>
-         <div class="form-group">
-            <textarea class="form-control" placeholder="Article body" rows="4" style="resize: none;"
-               v-model="article.body"></textarea>
-         </div>
-         <button type="submit" class="btn btn-outline-primary">Save article</button>
-      </form>
+      </div>
+
+      <!-- Pagination -->
       <nav class="mt-3">
          <ul class="pagination pagination-sm">
             <li v-bind:class="[{disabled: !pagination.prev_page_url}]" class="page-item">
@@ -27,14 +60,19 @@
             </li>
          </ul>
       </nav>
+
+      <!-- Article card -->
       <div class="card my-3" v-bind:key="article.id" v-for="article in articles">
          <div class="card-body">
             <h5 class="card-title">{{ article.title }}</h5>
             <p class="card-text">{{ article.body }}</p>
-            <button v-on:click="editArticle(article)" class="btn btn-outline-primary btn-sm">Edit</button>
+            <button v-on:click="editArticle(article)" class="btn btn-outline-primary btn-sm"
+               data-toggle="modal" data-target="#articleModalForm">Edit</button>
             <button v-on:click="deleteArticle(article.id)" class="btn btn-outline-danger btn-sm ml-1">Delete</button>
          </div>
       </div>
+
+      <!-- Pagination -->
       <nav class="mt-3">
          <ul class="pagination pagination-sm">
             <li v-bind:class="[{disabled: !pagination.prev_page_url}]" class="page-item">
@@ -50,6 +88,7 @@
             </li>
          </ul>
       </nav>
+
    </div>
 </template>
 
@@ -64,7 +103,9 @@
                body: ""
             },
             pagination: {},
-            edit: false
+            edit: false,
+            modalTitle: "",
+            saveButtonText: ""
          };
       },
       created: function(){
@@ -104,6 +145,7 @@
             }
          },
          saveArticle: function(){
+            this.$refs.cancelButton.click();
             if(!this.edit){
                // Add article...
                fetch("api/article/store", {
@@ -129,7 +171,6 @@
                   .then((response) => {
                      this.article.title = "";
                      this.article.body = "";
-                     this.edit = false;
                      this.fetchArticles();
                   })
                   .catch((error) => {console.log(error)});
@@ -137,9 +178,19 @@
          },
          editArticle: function(article){
             this.edit = true;
+            this.modalTitle = "Edit article";
+            this.saveButtonText = "Save changes";
             this.article.id = article.id;
             this.article.title = article.title;
             this.article.body = article.body;
+         },
+         clearModalForm: function(){
+            this.edit = false;
+            this.modalTitle = "New article";
+            this.saveButtonText = "Save";
+            this.article.id = "";
+            this.article.title = "";
+            this.article.body = "";
          }
       }
    }
