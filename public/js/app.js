@@ -2002,6 +2002,39 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2047,21 +2080,20 @@ __webpack_require__.r(__webpack_exports__);
     deleteArticle: function deleteArticle(id) {
       var _this2 = this;
 
-      if (confirm("Are you sure to delete this article ?")) {
-        fetch("api/article/destroy/" + id, {
-          method: "delete"
-        }).then(function (response) {
-          return response.json();
-        }).then(function (response) {
-          if (_this2.articles.length == 1) {
-            _this2.fetchArticles("api/articles?page=" + (_this2.pagination.current_page - 1));
-          } else {
-            _this2.fetchArticles();
-          }
-        })["catch"](function (error) {
-          console.log(error);
-        });
-      }
+      this.$refs.cancelDeleteButton.click();
+      fetch("api/article/destroy/" + id, {
+        method: "delete"
+      }).then(function (response) {
+        return response.json();
+      }).then(function (response) {
+        if (_this2.articles.length == 1) {
+          _this2.fetchArticles("api/articles?page=" + (_this2.pagination.current_page - 1));
+        } else {
+          _this2.fetchArticles();
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
     },
     saveArticle: function saveArticle() {
       var _this3 = this;
@@ -2106,13 +2138,19 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    editArticle: function editArticle(article) {
+    showEditModalForm: function showEditModalForm(article) {
       this.edit = true;
       this.modalTitle = "Edit article";
       this.saveButtonText = "Save changes";
       this.article.id = article.id;
       this.article.title = article.title;
       this.article.body = article.body;
+    },
+    showDeleteModalForm: function showDeleteModalForm(article) {
+      this.article.id = article.id;
+      this.article.title = article.title;
+      this.article.body = article.body;
+      this.$refs.deleteTriggerButton.click();
     },
     clearModalForm: function clearModalForm() {
       this.edit = false;
@@ -37752,7 +37790,7 @@ var render = function() {
                 },
                 on: {
                   click: function($event) {
-                    return _vm.editArticle(article)
+                    return _vm.showEditModalForm(article)
                   }
                 }
               },
@@ -37765,7 +37803,7 @@ var render = function() {
                 staticClass: "btn btn-outline-danger btn-sm ml-1",
                 on: {
                   click: function($event) {
-                    return _vm.deleteArticle(article.id)
+                    return _vm.showDeleteModalForm(article)
                   }
                 }
               },
@@ -37774,6 +37812,90 @@ var render = function() {
           ])
         ])
       }),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          ref: "deleteTriggerButton",
+          staticStyle: { display: "none" },
+          attrs: {
+            type: "button",
+            "data-target": "#deleteArticleModalForm",
+            "data-toggle": "modal"
+          }
+        },
+        [_vm._v("\n      delete article\n   ")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "deleteArticleModalForm",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "form",
+                  {
+                    attrs: { action: "#" },
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.deleteArticle(_vm.article.id)
+                      }
+                    }
+                  },
+                  [
+                    _c("div", { staticClass: "modal-body" }, [
+                      _vm._v("\n                  Are you sure to delete "),
+                      _c("strong", [_vm._v(_vm._s(_vm.article.title))]),
+                      _vm._v(" article ?\n               ")
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "modal-footer" }, [
+                      _c(
+                        "button",
+                        {
+                          ref: "cancelDeleteButton",
+                          staticClass: "btn btn-secondary",
+                          attrs: { type: "button", "data-dismiss": "modal" }
+                        },
+                        [
+                          _vm._v(
+                            "\n                     Cancel\n                  "
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger",
+                          attrs: { type: "submit" }
+                        },
+                        [_vm._v("Delete")]
+                      )
+                    ])
+                  ]
+                )
+              ])
+            ]
+          )
+        ]
+      ),
       _vm._v(" "),
       _c("nav", { staticClass: "mt-3" }, [
         _c("ul", { staticClass: "pagination pagination-sm" }, [
@@ -37863,6 +37985,31 @@ var staticRenderFns = [
       },
       [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
     )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("Delete article")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
   }
 ]
 render._withStripped = true

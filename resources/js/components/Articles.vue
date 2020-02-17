@@ -1,15 +1,16 @@
 
 <template>
    <div class="my-4">
+
       <h2 class="mb-3">Articles</h2>
 
-      <!-- Button trigger modal -->
+      <!-- Button trigger new article modal form -->
       <button type="button" v-on:click="clearModalForm" class="btn btn-outline-primary" data-toggle="modal"
          data-target="#articleModalForm">
          Add article
       </button>
 
-      <!-- Modal -->
+      <!-- New article modal form -->
       <div class="modal fade" id="articleModalForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
          <div class="modal-dialog" role="document">
@@ -66,9 +67,41 @@
          <div class="card-body">
             <h5 class="card-title">{{ article.title }}</h5>
             <p class="card-text">{{ article.body }}</p>
-            <button v-on:click="editArticle(article)" class="btn btn-outline-primary btn-sm"
+            <button v-on:click="showEditModalForm(article)" class="btn btn-outline-primary btn-sm"
                data-toggle="modal" data-target="#articleModalForm">Edit</button>
-            <button v-on:click="deleteArticle(article.id)" class="btn btn-outline-danger btn-sm ml-1">Delete</button>
+            <button v-on:click="showDeleteModalForm(article)" class="btn btn-outline-danger btn-sm ml-1">Delete</button>
+         </div>
+      </div>
+
+      <!-- Button trigger delete article modal form -->
+      <button type="button" data-target="#deleteArticleModalForm" data-toggle="modal" style="display: none;"
+         ref="deleteTriggerButton">
+         delete article
+      </button>
+
+      <!-- Delete article modal form -->
+      <div class="modal fade" id="deleteArticleModalForm" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Delete article</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <form action="#" v-on:submit.prevent="deleteArticle(article.id)">
+                  <div class="modal-body">
+                     Are you sure to delete <strong>{{ article.title }}</strong> article ?
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-dismiss="modal" ref="cancelDeleteButton">
+                        Cancel
+                     </button>
+                     <button type="submit" class="btn btn-danger">Delete</button>
+                  </div>
+               </form>
+            </div>
          </div>
       </div>
 
@@ -131,18 +164,17 @@
             };
          },
          deleteArticle: function(id){
-            if(confirm("Are you sure to delete this article ?")){
-               fetch("api/article/destroy/" + id, {method: "delete"})
-                  .then((response) => {return response.json()})
-                  .then((response) => {
-                     if(this.articles.length == 1){
-                        this.fetchArticles("api/articles?page=" + (this.pagination.current_page - 1));
-                     }else{
-                        this.fetchArticles();
-                     }
-                  })
-                  .catch((error) => {console.log(error)});
-            }
+            this.$refs.cancelDeleteButton.click();
+            fetch("api/article/destroy/" + id, {method: "delete"})
+               .then((response) => {return response.json()})
+               .then((response) => {
+                  if(this.articles.length == 1){
+                     this.fetchArticles("api/articles?page=" + (this.pagination.current_page - 1));
+                  }else{
+                     this.fetchArticles();
+                  }
+               })
+               .catch((error) => {console.log(error)});
          },
          saveArticle: function(){
             this.$refs.cancelButton.click();
@@ -176,13 +208,19 @@
                   .catch((error) => {console.log(error)});
             }
          },
-         editArticle: function(article){
+         showEditModalForm: function(article){
             this.edit = true;
             this.modalTitle = "Edit article";
             this.saveButtonText = "Save changes";
             this.article.id = article.id;
             this.article.title = article.title;
             this.article.body = article.body;
+         },
+         showDeleteModalForm: function(article){
+            this.article.id = article.id;
+            this.article.title = article.title;
+            this.article.body = article.body;
+            this.$refs.deleteTriggerButton.click();
          },
          clearModalForm: function(){
             this.edit = false;
